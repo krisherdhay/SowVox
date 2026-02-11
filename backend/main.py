@@ -1,53 +1,19 @@
-import os
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from sqlalchemy import create_engine, Column, Integer, String, Float
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker
+import models  # noqa: F401 — ensures tables are created on startup
+from routes import router
 
-# 1. Database Setup
-IS_RAILWAY = os.environ.get("RAILWAY_ENVIRONMENT")
-if IS_RAILWAY:
-    DATABASE_URL = "sqlite:////data/sowvox.db"
-else:
-    DATABASE_URL = "sqlite:///./test_sow.db"
-
-engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False})
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-Base = declarative_base()
-
-# 2. Sow Data Model
-class SowData(Base):
-    __tablename__ = "sow_records"
-    id = Column(Integer, primary_key=True, index=True)
-    sow_id = Column(String)
-    weight_kg = Column(Float)
-    feed_intake_g = Column(Float)
-
-Base.metadata.create_all(bind=engine)
-
-# 3. Initialize FastAPI (ONLY ONCE)
 app = FastAPI()
 
-# 4. Enable CORS so Netlify can talk to Railway
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"], 
+    allow_origins=[
+        "https://sowvox.netlify.app",
+        "http://localhost:3000",
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# 5. Routes
-@app.get("/")
-def read_root():
-    return {
-        "message": "SowVox Backend is Active", 
-        "storage": "Railway Volume" if IS_RAILWAY else "Local"
-    }
-
-@app.post("/webhook")
-def receive_nedap_data(data: dict):
-    # This is for your future Nedap feeder data
-    print(f"Received data: {data}")
-    return {"status": "success"}
+app.include_router(router)
