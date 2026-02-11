@@ -1,13 +1,17 @@
-from sqlalchemy import Column, Integer, String, Float
+import json
+from sqlalchemy import Column, Integer, String, DateTime
+from sqlalchemy.sql import func
 from database import Base, engine
 
 
-class SowData(Base):
-    __tablename__ = "sow_records"
+class WebhookEvent(Base):
+    __tablename__ = "webhook_events"
     id = Column(Integer, primary_key=True, index=True)
-    sow_id = Column(String)
-    weight_kg = Column(Float)
-    feed_intake_g = Column(Float)
+    payload = Column(String)
+    received_at = Column(DateTime, server_default=func.now())
+
+    def payload_json(self):
+        return json.loads(self.payload)
 
 
 Base.metadata.create_all(bind=engine)

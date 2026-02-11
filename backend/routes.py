@@ -1,5 +1,7 @@
+import json
 from fastapi import APIRouter
-from database import IS_RAILWAY
+from database import IS_RAILWAY, SessionLocal
+from models import WebhookEvent
 
 router = APIRouter()
 
@@ -14,5 +16,11 @@ def read_root():
 
 @router.post("/webhook")
 def receive_nedap_data(data: dict):
-    print(f"Received data: {data}")
+    db = SessionLocal()
+    try:
+        event = WebhookEvent(payload=json.dumps(data))
+        db.add(event)
+        db.commit()
+    finally:
+        db.close()
     return {"status": "success"}
