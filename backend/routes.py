@@ -24,3 +24,20 @@ def receive_nedap_data(data: dict):
     finally:
         db.close()
     return {"status": "success"}
+
+
+@router.get("/webhook/events")
+def get_events():
+    db = SessionLocal()
+    try:
+        events = db.query(WebhookEvent).order_by(WebhookEvent.id.desc()).all()
+        return [
+            {
+                "id": e.id,
+                "payload": json.loads(e.payload),
+                "received_at": str(e.received_at),
+            }
+            for e in events
+        ]
+    finally:
+        db.close()
