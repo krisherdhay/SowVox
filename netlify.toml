@@ -1,0 +1,14 @@
+[build]
+  # Tell Netlify to enter the frontend folder before building
+  base = "frontend"
+  # Vite puts the finished site in 'dist'
+  publish = "dist"
+  # The command to compile your React code
+  command = "npm run build"
+
+[[redirects]]
+  # This fixes the "404 on refresh" error common in React apps
+  from = "/*"
+  to = "/index.html"
+  status = 200
+  
