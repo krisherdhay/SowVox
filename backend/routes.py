@@ -1,7 +1,8 @@
 import json
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
 from database import IS_RAILWAY, SessionLocal
 from models import WebhookEvent
+from auth import verify_token
 
 router = APIRouter()
 
@@ -14,8 +15,13 @@ def read_root():
     }
 
 
+@router.get("/auth/callback")
+def auth_callback():
+    return {"message": "Auth0 callback received"}
+
+
 @router.post("/webhook")
-def receive_nedap_data(data: dict):
+def receive_nedap_data(data: dict, _token=Depends(verify_token)):
     db = SessionLocal()
     try:
         event = WebhookEvent(payload=json.dumps(data))
