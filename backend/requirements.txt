@@ -4,3 +4,9 @@ sqlalchemy
 python-jose[cryptography]
 httpx
 python-dotenv
+python-multipart
+pandas
+pyarrow
+scikit-learn
+xgboost
+#add either tensorflow or torch
