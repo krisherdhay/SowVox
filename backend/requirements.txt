@@ -1,10 +1,10 @@
 fastapi
 uvicorn
+python-multipart
+httpx
 sqlalchemy
 python-jose[cryptography]
-httpx
 python-dotenv
-python-multipart
 pandas
 pyarrow
 scikit-learn
